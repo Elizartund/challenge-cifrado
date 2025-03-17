@@ -1,18 +1,209 @@
-# Build and Release Folders
-bin-debug/
-bin-release/
-[Oo]bj/
-[Bb]in/
+# Cargar vectores de sustantivos mas usados
+import json
+import os
 
-# Other files and folders
-.settings/
+# Get the current working directory
+current_directory = os.getcwd()
+print(f"Current working directory: {current_directory}")
 
-# Executables
-*.swf
-*.air
-*.ipa
-*.apk
+# Option 1: Update the file path if the
+def cosine_similarity(v1, v2):
 
-# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
-# should NOT be excluded as they contain compiler settings and other important
-# information for Eclipse / Flash Builder.
+  dot_product = sum(
+    [a * b for a, b in zip(v1, v2)])
+  
+  magnitude = (
+    sum([a**2 for a in v1]) *
+    sum([a**2 for a in v2])) ** 0.5
+
+  return dot_product / magnitude
+  #cosine_similarity(vectors_emb3['perro'], vectors_emb3['gato']) #This line is unnecessary and might cause errors if vectors_emb3 is not defined. I've commented it out.
+
+import pandas as pd
+
+def most_similar(word: str, vectors: dict) -> list[list]:
+    """Devuelve las 10 palabras más similares y sus similitudes respecto a la palabra dada"""
+    word_vector = vectors[word]
+    similarities = {w: cosine_similarity(word_vector, vector) for w, vector in vectors.items()}
+    most_similar_words = sorted(similarities, key=similarities.get, reverse=True)
+    return pd.DataFrame([(word, similarities[word]) for word in most_similar_words[:10]], columns=['palabra', 'similitud'])
+
+word = 'perro'
+
+# ----> Load your word embeddings here <----
+# Example: If you have the embeddings stored in a JSON file:
+# with open('path/to/your/embeddings.json', 'r') as f:
+#     vectors_ada2 = json.load(f)
+#
+# Replace 'path/to/your/embeddings.json' with the actual path to your file.
+
+# Or if you're generating the embeddings within your notebook...
+# ... add the code to create 'vectors_ada2' before this point
+
+# Example: Creating a sample vectors_ada2 for demonstration
+vectors_ada2 = {
+    'perro': [0.2, 0.5, 0.7],
+    'gato': [0.3, 0.4, 0.6],
+    'casa': [0.1, 0.8, 0.2],
+    # ... add more words and their embeddings
+}
+
+
+most_similar(word, vectors_ada2)
+
+# Cargar vectores de sustantivos mas usados
+import json
+import os
+import pandas as pd
+
+# Get the current working directory
+current_directory = os.getcwd()
+print(f"Current working directory: {current_directory}")
+
+# Option 1: Update the file path if the
+def cosine_similarity(v1, v2):
+
+  dot_product = sum(
+    [a * b for a, b in zip(v1, v2)])
+  
+  magnitude = (
+    sum([a**2 for a in v1]) *
+    sum([a**2 for a in v2])) ** 0.5
+
+  return dot_product / magnitude
+  #cosine_similarity(vectors_emb3['perro'], vectors_emb3['gato']) #This line is unnecessary and might cause errors if vectors_emb3 is not defined. I've commented it out.
+
+
+
+def most_similar(word: str, vectors: dict) -> list[list]:
+    """Devuelve las 10 palabras más similares y sus similitudes respecto a la palabra dada"""
+    word_vector = vectors[word]
+    similarities = {w: cosine_similarity(word_vector, vector) for w, vector in vectors.items()}
+    most_similar_words = sorted(similarities, key=similarities.get, reverse=True)
+    return pd.DataFrame([(word, similarities[word]) for word in most_similar_words[:10]], columns=['palabra', 'similitud'])
+
+word = 'perro'
+
+# ----> Load your word embeddings here <----
+# Example: If you have the embeddings stored in a JSON file:
+# with open('path/to/your/embeddings.json', 'r') as f:
+#     vectors_ada2 = json.load(f)
+#
+# Replace 'path/to/your/embeddings.json' with the actual path to your file.
+
+# Or if you're generating the embeddings within your notebook...
+# ... add the code to create 'vectors_ada2' before this point
+
+# Example: Creating a sample vectors_ada2 for demonstration
+vectors_ada2 = {
+    'perro': [0.2, 0.5, 0.7],
+    'gato': [0.3, 0.4, 0.6],
+    'casa': [0.1, 0.8, 0.2],
+    # ... add more words and their embeddings
+}
+
+# ----> Load or define vectors_emb3 here <----
+# Example: Loading from a JSON file
+# with open('path/to/your/embeddings3.json', 'r') as f:
+#     vectors_emb3 = json.load(f)
+
+# Or creating a sample vectors_emb3
+vectors_emb3 = {
+    'perro': [0.3, 0.6, 0.8],
+    'gato': [0.4, 0.5, 0.7],
+    'pájaro': [0.1, 0.7, 0.3],
+    # ... add more words and their embeddings
+}
+
+
+most_similar(word, vectors_ada2)
+most_similar(word, vectors_emb3)
+
+# Visualizaciones de espacio de similitud
+import numpy as np
+from sklearn.decomposition import PCA
+
+
+def perform_pca(vectors: dict):
+    """Realiza PCA en los vectores de palabras y devuelve los vectores transformados mediante PCA"""
+    X = np.array(list(vectors.values()))
+    pca = PCA(n_components=3)
+    X_pca = pca.fit_transform(X)
+    X_pca = {list(vectors.keys())[i]: X_pca[i] for i in range(len(vectors))}
+    return X_pca
+
+
+vectors_ada2_pca = perform_pca(vectors_ada2)
+vectors_emb3_pca = perform_pca(vectors_emb3)
+import matplotlib.pyplot as plt
+
+def render_vectors_3d(vectors: dict, title: str):
+    """Renderiza vectores 3D (key: [,,,]) en un gráfico 3D"""
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    # Grafica los vectores como puntos
+    for key, vector in vectors.items():
+        ax.scatter(vector[0], vector[1], vector[2])
+        ax.text(vector[0], vector[1], vector[2], key)
+
+    # calular el max y min valor para cada dimension
+    min_x = min(v[0] for v in vectors.values())
+    max_x = max(v[0] for v in vectors.values())
+    min_y = min(v[1] for v in vectors.values())
+    max_y = max(v[1] for v in vectors.values())
+    min_z = min(v[2] for v in vectors.values())
+    max_z = max(v[2] for v in vectors.values())
+    ax.set_xlim([min_x, max_x])
+    ax.set_ylim([min_y, max_y])
+    ax.set_zlim([min_z, max_z])
+    ax.set_title(title)
+    plt.show()
+
+
+# obten un subset de vectores para plotting
+words = ['presidente', 'computadora', 'perro', 'avena', 'coche', 'cerebro', 'casa', 'árbol', 'animal', 'rosa']
+# Filter words to only include those present in vectors_ada2_pca and vectors_emb3_pca
+word_pca_vectors_ada2 = {word: vectors_ada2_pca[word] for word in words if word in vectors_ada2_pca}
+word_pca_vectors_emb3 = {word: vectors_emb3_pca[word] for word in words if word in vectors_emb3_pca}
+
+# grafica los vectores
+render_vectors_3d(word_pca_vectors_ada2, 'OpenAI Ada-002')
+render_vectors_3d(word_pca_vectors_emb3, 'OpenAI Text-Embedding-3-Small (1536)')
+
+def cosine_similarity_histogram(word: str, vectors: dict):
+    """Grafica un histograma de las similitudes del coseno de la palabra con todas las demás palabras"""
+    word_vector = vectors[word]
+    similarities = [cosine_similarity(word_vector, vectors[w]) for w in vectors if w != word]
+    plt.hist(similarities, bins=20, range=(0, 1))
+    plt.xlabel('Cosine similarity')
+    plt.ylabel('Frequency')
+    plt.show()
+
+word = 'perro'
+cosine_similarity_histogram(word, vectors_ada2)
+cosine_similarity_histogram(word, vectors_emb3)
+# Explora vectores multi palabras
+import json
+import os
+
+# Check if the 'embeddings' directory exists and create it if it doesn't
+embeddings_dir = os.path.join(os.getcwd(), 'embeddings')
+if not os.path.exists(embeddings_dir):
+    os.makedirs(embeddings_dir)
+    print(f"Created directory: {embeddings_dir}")
+
+# Get the absolute path to the file
+file_path = os.path.join(embeddings_dir, 'peliculas_text-embedding-3-small-1536.json')  
+
+# If you know the full path directly, you can also use:
+# file_path = '/path/to/your/embeddings/peliculas_text-embedding-3-small-1536.json'
+
+# Check if the file exists and provide guidance if it doesn't
+if not os.path.exists(file_path):
+    print(f"Error: File not found at {file_path}")
+    print("Please make sure the file exists or update the 'file_path' variable.")
+else:
+    with open(file_path) as f:
+        movies = json.load(f)
+
+    # ... rest of your code ...
